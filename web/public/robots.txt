@@ -1,0 +1,3 @@
+# Stockroom is a reference implementation, not a production service.
+User-agent: *
+Disallow: /
