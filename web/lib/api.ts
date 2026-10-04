@@ -1,6 +1,20 @@
 import type { Order, Problem, StockRow } from './types';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+/**
+ * Where the API lives depends on who is asking.
+ *
+ * In the browser it is the port published on the developer's machine. During
+ * server-side rendering inside the compose network it is another container, and
+ * `localhost` there means the web container itself. One variable cannot be
+ * both: using the browser's URL on the server fails at render time with a bare
+ * "fetch failed", which is exactly what `docker compose up` used to produce.
+ */
+const BASE =
+  typeof window === 'undefined'
+    ? process.env.API_INTERNAL_URL ??
+      process.env.NEXT_PUBLIC_API_URL ??
+      'http://localhost:9192'
+    : process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:9192';
 
 /**
  * Every call returns one of three outcomes, never a thrown string.

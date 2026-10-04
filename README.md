@@ -11,8 +11,12 @@ same moment?*
 docker compose up --build
 ```
 
-Then open <http://localhost:3000>. The API is on <http://localhost:8080>, with
-OpenAPI docs at <http://localhost:8080/docs>.
+Then open <http://localhost:3000>. The API is on <http://localhost:9192>, with
+OpenAPI docs at <http://localhost:9192/docs>.
+
+The API and Postgres bind to 9192 and 55432 on your machine rather than the
+conventional 8080 and 5432, which are the two ports most likely to be in use
+already. Inside the compose network they still speak 8080 and 5432.
 
 ---
 
@@ -136,7 +140,7 @@ web/     Next.js 16, React 19, TypeScript (strict)
 ## Running without Docker
 
 ```bash
-# Postgres on :5432 with database/user/password all 'stockroom'
+# Postgres on :55432 with database/user/password all 'stockroom'
 cd api && ./mvnw spring-boot:run
 
 cd web && npm install && npm run dev

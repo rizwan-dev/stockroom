@@ -1,6 +1,11 @@
 # One command brings up the database, the API and the web app:
 #   docker compose up --build
 #
+# Host ports are deliberately unusual - 9192 for the API and 55432 for Postgres.
+# Inside the compose network the containers still speak 8080 and 5432; only what
+# is claimed on your machine changes, because 8080 and 5432 are the two ports
+# most likely to be occupied already.
+#
 # The API waits for Postgres to be genuinely ready rather than merely started,
 # and the web app waits for the API's readiness probe. Without that, the first
 # run races and the UI loads against an API that is still migrating.
@@ -13,7 +18,7 @@ services:
       POSTGRES_USER: stockroom
       POSTGRES_PASSWORD: stockroom
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - stockroom-data:/var/lib/postgresql/data
     healthcheck:
@@ -30,7 +35,7 @@ services:
       DB_PASSWORD: stockroom
       APP_CORS_ALLOWED_ORIGINS: http://localhost:3000
     ports:
-      - "8080:8080"
+      - "9192:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +43,11 @@ services:
   web:
     build: ./web
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8080
+      # What the browser uses...
+      NEXT_PUBLIC_API_URL: http://localhost:9192
+      # ...and what server-side rendering uses, on the compose network, where
+      # localhost would mean this container rather than the API.
+      API_INTERNAL_URL: http://api:8080
     ports:
       - "3000:3000"
     depends_on:
